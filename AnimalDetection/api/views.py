@@ -1,21 +1,43 @@
+# views.py
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from .models import Detection, Alert
-from .serializers import DetectionSerializer, AlertSerializer
+from .serializers import DetectionSerializer, AlertSerializer, UserSerializer
+
+class RegisterUserView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]  # Allow access to registration without authentication
+
+
+class LoginUserView(APIView):
+    permission_classes = [AllowAny]  # Allow access to login without authentication
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DetectionListCreate(generics.ListCreateAPIView):
     queryset = Detection.objects.all()
     serializer_class = DetectionSerializer
 
-
 class DetectionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Detection.objects.all()
     serializer_class = DetectionSerializer
     lookup_field = "id"
-
 
 class DetectionFilterView(APIView):
     def get(self, request, species=None, location=None):
@@ -46,7 +68,6 @@ class DetectionFilterView(APIView):
         detection = get_object_or_404(Detection, id=id)
         detection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class AlertListCreate(generics.ListCreateAPIView):
     queryset = Alert.objects.all()

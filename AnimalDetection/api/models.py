@@ -7,6 +7,7 @@ class Detection(models.Model):
     image = models.ImageField(upload_to="detections/")  # Image file sent from the IoT device
     timestamp = models.DateTimeField(auto_now_add=True)  # Timestamp of when the image was captured
     detected = models.BooleanField(default=False)        # Whether a wild animal was detected
+    dangerous = models.BooleanField(default=False)
     confidence_score = models.FloatField(null=True, blank=True)  # Confidence score from the ML model
     species = models.CharField(max_length=100, null=True, blank=True)  # Species name, if identified
 
