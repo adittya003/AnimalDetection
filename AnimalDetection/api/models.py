@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+# Detection Model
 class Detection(models.Model):
     device_name = models.CharField(max_length=100)  # Name of the IoT device capturing the image
     location = models.CharField(max_length=255)     # Location where the image was captured
@@ -15,7 +16,7 @@ class Detection(models.Model):
         status = "Animal Detected" if self.detected else "No Animal Detected"
         return f"{status} - {self.device_name} at {self.timestamp}"
 
-
+# Alert Model
 class Alert(models.Model):
     detection = models.ForeignKey(Detection, on_delete=models.CASCADE, related_name="alerts")
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Authorized user who triggered the alert

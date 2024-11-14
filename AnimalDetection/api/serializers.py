@@ -1,8 +1,8 @@
-# serializers.py
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Detection, Alert
 
+# User Serializer
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
@@ -17,11 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
+# Detection Serializer
 class DetectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detection
         fields = ["id", "device_name", "location", "image", "timestamp", "detected", "confidence_score", "species", "dangerous"]
 
+# Alert Serializer
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
